@@ -1,14 +1,15 @@
 package io.github.devtae.taskmanagementsystem.controller;
 
-import io.github.devtae.taskmanagementsystem.exception.TaskNotFoundException;
 import io.github.devtae.taskmanagementsystem.model.Task;
 import io.github.devtae.taskmanagementsystem.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -21,12 +22,10 @@ public class TaskController {
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<Task> getTask(@PathVariable Long taskId) {
-        Task task = taskService.getTaskById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+    public ResponseEntity<Optional<Task>> getTask(@PathVariable Long taskId) {
+        Optional<Task> task = taskService.getTaskById(taskId);
         return ResponseEntity.ok(task);
     }
-
 
     @GetMapping
     public List<Task> getAllTasks() {
@@ -36,30 +35,20 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task savedTask = taskService.saveTask(task);
-        return ResponseEntity.ok(savedTask);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @RequestBody Task taskDetails) {
-        Task task = taskService.getTaskById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-
-        // Assuming you have setter methods to update the fields of Task
-        task.setTitle(taskDetails.getTitle());
-        task.setDescription(taskDetails.getDescription());
-        task.setDueDate(taskDetails.getDueDate());
-        task.setCompleted(taskDetails.isCompleted());
-
-        Task updatedTask = taskService.saveTask(task);
+    public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @Valid @RequestBody Task taskDetails) {
+        Task updatedTask = taskService.updateTask(taskId, taskDetails);
         return ResponseEntity.ok(updatedTask);
     }
-
 
 
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable long taskId) {
         taskService.deleteTask(taskId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
