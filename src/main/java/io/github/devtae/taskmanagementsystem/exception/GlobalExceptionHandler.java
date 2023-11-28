@@ -21,7 +21,10 @@ public class GlobalExceptionHandler {
         // Create a structured error response body
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("message", "Task not found");
+        body.put("errors", "Task not found");
+
+        // Add logging here to check if the handler is being invoked
+        System.out.println("Handler invoked: " + body);
 
         // Return the response entity with a specific HTTP status
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
@@ -42,6 +45,9 @@ public class GlobalExceptionHandler {
 
         body.put("errors", errors);
 
+        // Add logging here to check if the handler is being invoked
+        System.out.println("Handler invoked: " + body);
+
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
@@ -50,7 +56,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("message", "An error occurred");
+        body.put("errors", "An error occurred");
+
+        // Add logging here to check if the handler is being invoked
+        System.out.println("Handler invoked: " + body);
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
