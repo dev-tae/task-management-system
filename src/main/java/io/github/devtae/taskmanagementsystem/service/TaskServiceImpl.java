@@ -17,6 +17,19 @@ public class TaskServiceImpl implements TaskService {
     public TaskServiceImpl(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Task> getTaskById(Long taskId) {
+        // This method returns Optional, which is then handled in the calling code.
+        return taskRepository.findById(taskId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
 
     @Override
     @Transactional
@@ -41,33 +54,20 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public void deleteTask(Long taskId) {
-        // Check if the task exists before attempting to delete.
-        Task task = getTaskById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-        taskRepository.delete(task);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Task> getTaskById(Long taskId) {
-        // This method returns Optional, which is then handled in the calling code.
-        return taskRepository.findById(taskId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
-
-    @Override
-    @Transactional
     public Task completeTask(Long taskId) {
         Task task = getTaskById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
         task.setCompleted(true);
         return taskRepository.save(task);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTask(Long taskId) {
+        // Check if the task exists before attempting to delete.
+        Task task = getTaskById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+        taskRepository.delete(task);
     }
 
     /**
