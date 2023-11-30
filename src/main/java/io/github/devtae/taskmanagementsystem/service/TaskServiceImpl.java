@@ -3,12 +3,11 @@ package io.github.devtae.taskmanagementsystem.service;
 import io.github.devtae.taskmanagementsystem.exception.TaskNotFoundException;
 import io.github.devtae.taskmanagementsystem.model.Task;
 import io.github.devtae.taskmanagementsystem.repository.TaskRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -17,13 +16,14 @@ public class TaskServiceImpl implements TaskService {
     public TaskServiceImpl(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
-    
+
     @Override
     @Transactional(readOnly = true)
-    public Optional<Task> getTaskById(Long taskId) {
-        // This method returns Optional, which is then handled in the calling code.
-        return taskRepository.findById(taskId);
+    public Task getTaskById(Long taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -40,8 +40,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public Task updateTask(Long taskId, Task taskDetails) {
-        Task existingTask = getTaskById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+        Task existingTask = getTaskById(taskId);
 
         boolean needsUpdate = checkForUpdates(existingTask, taskDetails);
 
@@ -55,19 +54,17 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public Task completeTask(Long taskId) {
-        Task task = getTaskById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-        task.setCompleted(true);
-        return taskRepository.save(task);
+        Task existingTask = getTaskById(taskId);
+        existingTask.setCompleted(true);
+        return taskRepository.save(existingTask);
     }
 
     @Override
     @Transactional
     public void deleteTask(Long taskId) {
         // Check if the task exists before attempting to delete.
-        Task task = getTaskById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-        taskRepository.delete(task);
+        Task existingTask = getTaskById(taskId);
+        taskRepository.delete(existingTask);
     }
 
     /**

@@ -14,11 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.Optional;
 
+import static org.mockito.BDDMockito.doNothing;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.*;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,7 +57,7 @@ public class TaskControllerTest {
 
     @Test
     public void whenGetTaskById_thenReturns200() throws Exception {
-        given(taskService.getTaskById(1L)).willReturn(Optional.of(task1));
+        given(taskService.getTaskById(1L)).willReturn(task1);
 
         mockMvc.perform(get("/api/tasks/{taskId}", expectedId1)
                 .contentType(MediaType.APPLICATION_JSON))
