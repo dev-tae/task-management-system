@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -22,8 +21,8 @@ public class TaskController {
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<Optional<Task>> getTask(@PathVariable Long taskId) {
-        Optional<Task> task = taskService.getTaskById(taskId);
+    public ResponseEntity<Task> getTask(@PathVariable Long taskId) {
+        Task task = taskService.getTaskById(taskId);
         return ResponseEntity.ok(task);
     }
 
@@ -38,13 +37,17 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
-
     @PutMapping("/{taskId}")
     public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @Valid @RequestBody Task taskDetails) {
         Task updatedTask = taskService.updateTask(taskId, taskDetails);
         return ResponseEntity.ok(updatedTask);
     }
 
+    @PutMapping("/{taskId}")
+    public ResponseEntity<Task> completeTask(@PathVariable Long taskId) {
+        Task completedTask = taskService.completeTask(taskId);
+        return ResponseEntity.ok(completedTask);
+    }
 
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable long taskId) {
